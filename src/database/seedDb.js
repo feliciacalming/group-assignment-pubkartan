@@ -52,7 +52,7 @@ const seedPubsDb = async () => {
           description TEXT,
           opening_hours TEXT,
           happy_hour TEXT,
-          beer_price TEXT
+          beer_price TEXT,
           webpage TEXT
         );
        `);
@@ -64,9 +64,9 @@ const seedPubsDb = async () => {
 
     pubs.forEach((pub, index, array) => {
       let string = "(";
-      for (let i = 1; i < 7; i++) {
+      for (let i = 1; i < 9; i++) {
         string += `$${pubInsertQueryVariables.length + i}`;
-        if (i < 6) string += ",";
+        if (i < 8) string += ",";
       }
       pubInsertQuery += string + ")";
       if (index < array.length - 1) pubInsertQuery += ",";
