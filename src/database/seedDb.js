@@ -2,10 +2,12 @@ const bcrypt = require("bcrypt");
 const { sequelize } = require("./config");
 const { users } = require("../data/users");
 const { pubs } = require("../data/pubs");
+const { reviews } = require("../data/reviews");
 
 const seedPubsDb = async () => {
   try {
     // Drop tables if exist
+    await sequelize.query(`DROP TABLE IF EXISTS review;`);
     await sequelize.query(`DROP TABLE IF EXISTS pub;`);
     await sequelize.query(`DROP TABLE IF EXISTS user;`);
 
@@ -88,6 +90,56 @@ const seedPubsDb = async () => {
 
     await sequelize.query(pubInsertQuery, {
       bind: pubInsertQueryVariables,
+    });
+
+    /************ Reviews ***********/
+
+    // Create review table
+    await sequelize.query(`
+     CREATE TABLE IF NOT EXISTS review (
+       id INTEGER PRIMARY KEY AUTOINCREMENT,
+       review TEXT NOT NULL,
+       rating INTEGER NOT NULL,
+       created_at TEXT NOT NULL,
+       fk_user_id INTEGER NOT NULL,
+       fk_pub_id INTEGER NOT NULL,
+       
+       FOREIGN KEY(fk_user_id) REFERENCES user(id),
+       FOREIGN KEY(fk_pub_id) REFERENCES pub(id)
+     );
+    `);
+
+    let reviewInsertQuery =
+      "INSERT INTO review (review, rating, created_at, fk_user_id, fk_pub_id) VALUES ";
+
+    let reviewInsertQueryVariables = [];
+
+    reviews.forEach((review, index, array) => {
+      let string = "(";
+      for (let i = 1; i < 6; i++) {
+        string += `$${reviewInsertQueryVariables.length + i}`;
+        if (i < 5) string += ",";
+      }
+      reviewInsertQuery += string + ")";
+      if (index < array.length - 1) reviewInsertQuery += ",";
+
+      const variables = [
+        review.review,
+        review.rating,
+        review.created_at,
+        review.fk_user_id,
+        review.fk_pub_id,
+      ];
+      reviewInsertQueryVariables = [
+        ...reviewInsertQueryVariables,
+        ...variables,
+      ];
+    });
+
+    reviewInsertQuery += ";";
+
+    await sequelize.query(reviewInsertQuery, {
+      bind: reviewInsertQueryVariables,
     });
 
     console.log("Database successfully populated with data...");
