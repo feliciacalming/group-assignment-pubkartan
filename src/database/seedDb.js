@@ -51,12 +51,14 @@ const seedPubsDb = async () => {
           city TEXT NOT NULL,
           description TEXT,
           opening_hours TEXT,
+          happy_hour TEXT,
+          beer_price TEXT
           webpage TEXT
         );
        `);
 
     let pubInsertQuery =
-      "INSERT INTO pub (name, address, city, description, opening_hours, webpage) VALUES ";
+      "INSERT INTO pub (name, address, city, description, opening_hours, happy_hour, beer_price, webpage) VALUES ";
 
     let pubInsertQueryVariables = [];
 
@@ -75,6 +77,8 @@ const seedPubsDb = async () => {
         pub.city,
         pub.description,
         pub.opening_hours,
+        pub.happy_hour,
+        pub.beer_price,
         pub.webpage,
       ];
       pubInsertQueryVariables = [...pubInsertQueryVariables, ...variables];
