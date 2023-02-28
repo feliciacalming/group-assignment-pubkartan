@@ -38,26 +38,7 @@ const seedPubsDb = async () => {
 
     userInsertQuery += ";";
 
-    console.log("!!!!!!!!!!");
-    console.log(userInsertQuery); //INSERT INTO user (email, password, role) VALUES ($1,$2,$3),($4,$5,$6),($7,$8,$9),($10,$11,$12);
-    console.log("!!!!!!!!!!");
-
     await sequelize.query(userInsertQuery);
-
-    // users.forEach((user, index, array) => {
-    //   let string = "(";
-    //   for (let i = 1; i < 4; i++) {
-    //     string += `$${userInsertQueryVariables.length + i}`;
-    //     if (i < 3) string += ",";
-    //   }
-    //   userInsertQuery += string + ")";
-    //   if (index < array.length - 1) userInsertQuery += ",";
-
-    //   const variables = [user.email, user.password, user.role];
-    //   userInsertQueryVariables = [...userInsertQueryVariables, ...variables];
-    // });
-
-    // userInsertQuery += ";";
 
     /************ Pubs ***********/
 
