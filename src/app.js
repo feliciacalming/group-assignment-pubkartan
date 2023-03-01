@@ -40,7 +40,7 @@ app.use(errorMiddleware);
 /* ---------------------------------------------- */
 /* ---------------- Server Setup ---------------- */
 /* ---------------------------------------------- */
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 const run = async () => {
   try {
     await sequelize.authenticate();

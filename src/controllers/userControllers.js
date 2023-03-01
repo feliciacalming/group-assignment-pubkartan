@@ -15,7 +15,7 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.getUserById = async (req, res) => {
-  const userId = req.params.userIdä;
+  const userId = req.params.userId;
   const [user, metadata] = await sequelize.query(
     "SELECT id, email FROM user WHERE id = $userId",
     {
@@ -24,7 +24,7 @@ exports.getUserById = async (req, res) => {
     }
   );
 
-  if (!user) throw new notFoundError("Den användaren finns inte.");
+  if (!user) throw new NotFoundError("Den användaren finns inte.");
 
   return res.json(user);
 };
