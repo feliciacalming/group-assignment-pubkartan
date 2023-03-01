@@ -17,25 +17,29 @@ const seedPubsDb = async () => {
     await sequelize.query(`
     CREATE TABLE IF NOT EXISTS user (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT NOT NULL, 
       email TEXT NOT NULL,
       password TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT "USER"
+      role TEXT NOT NULL DEFAULT "USER",
+      created_at TEXT NOT NULL
       );
       `);
 
-    let userInsertQuery = `INSERT INTO user (email, password, role) VALUES `;
+    let userInsertQuery = `INSERT INTO user (username, email, password, role, created_at) VALUES `;
 
     let userInsertQueryVariables = [];
 
     for (let i = 0; i < users.length; i++) {
+      let username = users[i].username;
       let email = users[i].email;
       let password = users[i].password;
       let role = users[i].role;
+      let created_at = users[i].created_at;
 
       const salt = await bcrypt.genSalt(10);
       const hashedpassword = await bcrypt.hash(password, salt);
 
-      let values = `("${email}", "${hashedpassword}", "${role}")`;
+      let values = `("${username}", "${email}", "${hashedpassword}", "${role}", "${created_at}")`;
       userInsertQuery += values;
       if (i < users.length - 1) userInsertQuery += ", ";
     }
@@ -43,6 +47,40 @@ const seedPubsDb = async () => {
     userInsertQuery += ";";
 
     await sequelize.query(userInsertQuery);
+
+    //city
+
+    await sequelize.query(`
+    CREATE TABLE IF NOT EXISTS city (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      city_name TEXT NOT NULL
+    );
+   `);
+
+    let cityInsertQuery = "INSERT INTO city (city_name) VALUES ";
+
+    let cityInsertQueryVariables = [];
+
+    console.log(cities);
+    cities.forEach((city, index, array) => {
+      let string = "(";
+      for (let i = 1; i < 2; i++) {
+        string += `$${cityInsertQueryVariables.length + i}`;
+        if (i < 1) string += ",";
+      }
+      cityInsertQuery += string + ")";
+      if (index < array.length - 1) cityInsertQuery += ",";
+
+      const variables = [city.city_name];
+      cityInsertQueryVariables = [...cityInsertQueryVariables, ...variables];
+      console.log(cityInsertQueryVariables);
+    });
+
+    cityInsertQuery += ";";
+
+    await sequelize.query(cityInsertQuery, {
+      bind: cityInsertQueryVariables,
+    });
 
     //city
 
@@ -85,11 +123,16 @@ const seedPubsDb = async () => {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
           address TEXT NOT NULL,
+          city TEXT NOT NULL,
           description TEXT,
           opening_hours TEXT,
           happy_hour TEXT,
           beer_price TEXT,
           webpage TEXT,
+          fk_user_id INTEGER,
+
+          FOREIGN KEY(fk_city_id) REFERENCES city(id),
+          FOREIGN KEY(fk_user_id) REFERENCES user(id),
           fk_city_id INTEGER NOT NULL,
           fk_user_id INTEGER NOT NULL,
 
@@ -115,6 +158,7 @@ const seedPubsDb = async () => {
       const variables = [
         pub.name,
         pub.address,
+        pub.city,
         pub.description,
         pub.opening_hours,
         pub.happy_hour,
