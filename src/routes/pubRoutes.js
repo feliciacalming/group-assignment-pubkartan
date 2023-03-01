@@ -15,15 +15,15 @@ const {
 router.get("/", getAllPubs);
 
 // GET Pub by Id /api/v1/pubs/:pubid
-router.get("/:pubid", getPubById);
+router.get("/:pubId", getPubById);
 
 // POST Create a new pub /api/v1/pubs/
 router.post("/", isAuthenticated, createNewPub);
 
 // PUT Update pub by Id /api/v1/pubs/:pubid
-router.put("/:pubid", isAuthenticated, updatePub);
+router.put("/:pubId", isAuthenticated, updatePub);
 
 // DELETE pub by Id /api/v1/pubs/:pubid
-router.delete("/:pubid", isAuthenticated, deletePubById);
+router.delete("/:pubId", isAuthenticated, deletePubById);
 
 module.exports = router;
