@@ -3,6 +3,8 @@ require("express-async-errors");
 const express = require("express");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const pubRoutes = require("./routes/pubRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 const { errorMiddleware } = require("./middleware/errorMiddleware");
 const { notFoundMiddleware } = require("./middleware/notFoundMiddleware");
 
@@ -26,6 +28,8 @@ app.use((req, res, next) => {
 /* ---------------------------------------------- */
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/pubs", pubRoutes);
+app.use("/api/v1/reviews", reviewRoutes);
 
 /* ---------------------------------------------- */
 /* --------------- Error Handling --------------- */

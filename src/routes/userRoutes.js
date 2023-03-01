@@ -1,9 +1,26 @@
 const express = require("express");
 const router = express.Router();
 const { userRoles } = require("../constants/users");
-const { deleteUserById } = require("../controllers/userControllers");
 const { isAuthenticated } = require("../middleware/authenticationMiddleware");
 
-router.delete("/:userId", isAuthenticated, deleteUserById);
+const { 
+    getAllUsers,
+    getUserById,
+    updateUser,
+    deleteUserById,
+} = require("../controllers/userControllers");
+
+// GET All users /api/v1/users
+router.get("/", isAuthenticated, getAllUsers);
+
+// GET User by Id /api/v1/users/:userid
+router.get("/:userid", isAuthenticated, getUserById);
+
+// PUT Update user by Id /api/v1/users/:userid
+// VI HADE INTE MED DENNA MEN BEHÖVER VI INTE KUNN AUPPDATERA EN USER MED ÄNDRINGAR
+router.put("/:userid", isAuthenticated, updateUser);
+
+// DELETE user by Id /api/v1/users/:userid
+router.delete("/:userid", isAuthenticated, deleteUserById);
 
 module.exports = router;
