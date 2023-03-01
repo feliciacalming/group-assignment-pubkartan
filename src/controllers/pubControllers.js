@@ -1,7 +1,7 @@
 exports.getAllPubs = async (req, res) => {
   let query;
   let options = {};
-  query = SELECT;
+  query = `SELECT * FROM pubs`;
 };
 
 exports.getPubById = async (req, res) => {
