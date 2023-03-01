@@ -29,6 +29,10 @@ exports.getUserById = async (req, res) => {
   return res.json(user);
 };
 
+exports.updateUser = async (req, res) => {
+  console.log("hej");
+};
+
 exports.deleteUserById = async (req, res) => {
   //placera användarId:t i en variabel
   const userId = req.params.userId;

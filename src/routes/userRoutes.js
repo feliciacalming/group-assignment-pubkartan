@@ -3,11 +3,11 @@ const router = express.Router();
 const { userRoles } = require("../constants/users");
 const { isAuthenticated } = require("../middleware/authenticationMiddleware");
 
-const { 
-    getAllUsers,
-    getUserById,
-    updateUser,
-    deleteUserById,
+const {
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUserById,
 } = require("../controllers/userControllers");
 
 // GET All users /api/v1/users
