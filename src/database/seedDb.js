@@ -25,6 +25,25 @@ const seedPubsDb = async () => {
     );
    `);
 
+    // Create pubs table
+    await sequelize.query(`
+   CREATE TABLE IF NOT EXISTS pub (
+     id INTEGER PRIMARY KEY AUTOINCREMENT,
+     name TEXT NOT NULL,
+     address TEXT NOT NULL,
+     fk_city_id INTEGER,
+     description TEXT,
+     opening_hours TEXT,
+     happy_hour TEXT,
+     beer_price INTEGER,
+     webpage TEXT,
+     fk_user_id INTEGER,
+     FOREIGN KEY(fk_city_id) REFERENCES city(id),
+     FOREIGN KEY(fk_user_id) REFERENCES user(id)
+   );
+  `);
+
+    // Create USER
     let userInsertQuery = `INSERT INTO user (username, email, password, role, created_at) VALUES `;
 
     let userInsertQueryVariables = [];
@@ -61,7 +80,6 @@ const seedPubsDb = async () => {
 
     let cityInsertQueryVariables = [];
 
-    console.log(cities);
     cities.forEach((city, index, array) => {
       let string = "(";
       for (let i = 1; i < 2; i++) {
@@ -83,25 +101,6 @@ const seedPubsDb = async () => {
     });
 
     /************ Pubs ***********/
-
-    // Create pubs table
-    await sequelize.query(`
-        CREATE TABLE IF NOT EXISTS pub (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
-          address TEXT NOT NULL,
-          fk_city_id INTEGER,
-          description TEXT,
-          opening_hours TEXT,
-          happy_hour TEXT,
-          beer_price TEXT,
-          webpage TEXT,
-          fk_user_id INTEGER,
-
-          FOREIGN KEY(fk_city_id) REFERENCES city(id),
-          FOREIGN KEY(fk_user_id) REFERENCES user(id)
-        );
-       `);
 
     let pubInsertQuery =
       "INSERT INTO pub (name, address, fk_city_id, description, opening_hours, happy_hour, beer_price, webpage, fk_user_id) VALUES ";
@@ -148,7 +147,7 @@ const seedPubsDb = async () => {
        created_at TEXT NOT NULL,
        fk_user_id INTEGER NOT NULL,
        fk_pub_id INTEGER NOT NULL,
-       
+
        FOREIGN KEY(fk_user_id) REFERENCES user(id),
        FOREIGN KEY(fk_pub_id) REFERENCES pub(id)
      );

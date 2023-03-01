@@ -79,7 +79,7 @@ exports.pubs = [
   {
     name: "Hank's Heaven",
     address: 1,
-    fk_city_id: "Stockholm",
+    fk_city_id: 1,
     description: "Kvarterskrog, när kvarterskrog är som mest kvarterskrog",
     opening_hours: "11-sent",
     happy_hour: "Ja",
