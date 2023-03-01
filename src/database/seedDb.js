@@ -1,12 +1,15 @@
+const bcrypt = require("bcrypt");
 const { sequelize } = require("./config");
 const { users } = require("../data/users");
 const { pubs } = require("../data/pubs");
+const { reviews } = require("../data/reviews");
 
 const seedPubsDb = async () => {
   try {
     // Drop tables if exist
-    await sequelize.query(`DROP TABLE IF EXISTS user;`);
+    await sequelize.query(`DROP TABLE IF EXISTS review;`);
     await sequelize.query(`DROP TABLE IF EXISTS pub;`);
+    await sequelize.query(`DROP TABLE IF EXISTS user;`);
 
     // Create user table
     await sequelize.query(`
@@ -18,28 +21,26 @@ const seedPubsDb = async () => {
     );
    `);
 
-    let userInsertQuery = "INSERT INTO user (email, password, role) VALUES ";
+    let userInsertQuery = `INSERT INTO user (email, password, role) VALUES `;
 
     let userInsertQueryVariables = [];
 
-    users.forEach((user, index, array) => {
-      let string = "(";
-      for (let i = 1; i < 4; i++) {
-        string += `$${userInsertQueryVariables.length + i}`;
-        if (i < 3) string += ",";
-      }
-      userInsertQuery += string + ")";
-      if (index < array.length - 1) userInsertQuery += ",";
+    for (let i = 0; i < users.length; i++) {
+      let email = users[i].email;
+      let password = users[i].password;
+      let role = users[i].role;
 
-      const variables = [user.email, user.password, user.role];
-      userInsertQueryVariables = [...userInsertQueryVariables, ...variables];
-    });
+      const salt = await bcrypt.genSalt(10);
+      const hashedpassword = await bcrypt.hash(password, salt);
+
+      let values = `("${email}", "${hashedpassword}", "${role}")`;
+      userInsertQuery += values;
+      if (i < users.length - 1) userInsertQuery += ", ";
+    }
 
     userInsertQuery += ";";
 
-    await sequelize.query(userInsertQuery, {
-      bind: userInsertQueryVariables,
-    });
+    await sequelize.query(userInsertQuery);
 
     /************ Pubs ***********/
 
@@ -52,22 +53,22 @@ const seedPubsDb = async () => {
           city TEXT NOT NULL,
           description TEXT,
           opening_hours TEXT,
-          webpage TEXT,
-          fk_user_id INTEGER NOT NULL,
-          FOREIGN KEY(fk_user_id) REFERENCES user(id)
+          happy_hour TEXT,
+          beer_price TEXT,
+          webpage TEXT
         );
        `);
 
     let pubInsertQuery =
-      "INSERT INTO pub (name, address, city, description, opening_hours, webpage, fk_user_id) VALUES ";
+      "INSERT INTO pub (name, address, city, description, opening_hours, happy_hour, beer_price, webpage) VALUES ";
 
     let pubInsertQueryVariables = [];
 
     pubs.forEach((pub, index, array) => {
       let string = "(";
-      for (let i = 1; i < 8; i++) {
+      for (let i = 1; i < 9; i++) {
         string += `$${pubInsertQueryVariables.length + i}`;
-        if (i < 7) string += ",";
+        if (i < 8) string += ",";
       }
       pubInsertQuery += string + ")";
       if (index < array.length - 1) pubInsertQuery += ",";
@@ -78,8 +79,9 @@ const seedPubsDb = async () => {
         pub.city,
         pub.description,
         pub.opening_hours,
+        pub.happy_hour,
+        pub.beer_price,
         pub.webpage,
-        pub.fk_user_id,
       ];
       pubInsertQueryVariables = [...pubInsertQueryVariables, ...variables];
     });
@@ -88,6 +90,56 @@ const seedPubsDb = async () => {
 
     await sequelize.query(pubInsertQuery, {
       bind: pubInsertQueryVariables,
+    });
+
+    /************ Reviews ***********/
+
+    // Create review table
+    await sequelize.query(`
+     CREATE TABLE IF NOT EXISTS review (
+       id INTEGER PRIMARY KEY AUTOINCREMENT,
+       review TEXT NOT NULL,
+       rating INTEGER NOT NULL,
+       created_at TEXT NOT NULL,
+       fk_user_id INTEGER NOT NULL,
+       fk_pub_id INTEGER NOT NULL,
+       
+       FOREIGN KEY(fk_user_id) REFERENCES user(id),
+       FOREIGN KEY(fk_pub_id) REFERENCES pub(id)
+     );
+    `);
+
+    let reviewInsertQuery =
+      "INSERT INTO review (review, rating, created_at, fk_user_id, fk_pub_id) VALUES ";
+
+    let reviewInsertQueryVariables = [];
+
+    reviews.forEach((review, index, array) => {
+      let string = "(";
+      for (let i = 1; i < 6; i++) {
+        string += `$${reviewInsertQueryVariables.length + i}`;
+        if (i < 5) string += ",";
+      }
+      reviewInsertQuery += string + ")";
+      if (index < array.length - 1) reviewInsertQuery += ",";
+
+      const variables = [
+        review.review,
+        review.rating,
+        review.created_at,
+        review.fk_user_id,
+        review.fk_pub_id,
+      ];
+      reviewInsertQueryVariables = [
+        ...reviewInsertQueryVariables,
+        ...variables,
+      ];
+    });
+
+    reviewInsertQuery += ";";
+
+    await sequelize.query(reviewInsertQuery, {
+      bind: reviewInsertQueryVariables,
     });
 
     console.log("Database successfully populated with data...");
