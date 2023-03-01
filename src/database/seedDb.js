@@ -3,6 +3,7 @@ const { sequelize } = require("./config");
 const { users } = require("../data/users");
 const { pubs } = require("../data/pubs");
 const { reviews } = require("../data/reviews");
+const { cities } = require("../data/cities");
 
 const seedPubsDb = async () => {
   try {
@@ -10,6 +11,7 @@ const seedPubsDb = async () => {
     await sequelize.query(`DROP TABLE IF EXISTS review;`);
     await sequelize.query(`DROP TABLE IF EXISTS pub;`);
     await sequelize.query(`DROP TABLE IF EXISTS user;`);
+    await sequelize.query(`DROP TABLE IF EXISTS city;`);
 
     // Create user table
     await sequelize.query(`
@@ -140,6 +142,40 @@ const seedPubsDb = async () => {
 
     await sequelize.query(reviewInsertQuery, {
       bind: reviewInsertQueryVariables,
+    });
+
+    //city
+
+    await sequelize.query(`
+    CREATE TABLE IF NOT EXISTS city (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      city_name TEXT NOT NULL
+    );
+   `);
+
+    let cityInsertQuery = "INSERT INTO city (city_name) VALUES ";
+
+    let cityInsertQueryVariables = [];
+
+    console.log(cities);
+    cities.forEach((city, index, array) => {
+      let string = "(";
+      for (let i = 1; i < 2; i++) {
+        string += `$${cityInsertQueryVariables.length + i}`;
+        if (i < 1) string += ",";
+      }
+      cityInsertQuery += string + ")";
+      if (index < array.length - 1) cityInsertQuery += ",";
+
+      const variables = [city.city_name];
+      cityInsertQueryVariables = [...cityInsertQueryVariables, ...variables];
+      console.log(cityInsertQueryVariables);
+    });
+
+    cityInsertQuery += ";";
+
+    await sequelize.query(cityInsertQuery, {
+      bind: cityInsertQueryVariables,
     });
 
     console.log("Database successfully populated with data...");

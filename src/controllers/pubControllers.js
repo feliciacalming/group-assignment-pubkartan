@@ -24,12 +24,12 @@ exports.createNewPub = async (req, res) => {
   } = req.body;
 
   const [newPubId] = await sequelize.query(
-    `INSERT INTO pub (name, address, city, description, opening_hours, happy_hour, beer_price, webpage) VALUES ($name, $address, $city, $description, $opening_hours, $happy_hour, $beer_price, $webpage);`,
+    `INSERT INTO pub (name, address, fk_city_id, description, opening_hours, happy_hour, beer_price, webpage, fk_user_id) VALUES ($name, $address, $fk_city_id, $description, $opening_hours, $happy_hour, $beer_price, $webpage, fk_user_id);`,
     {
       bind: {
         name: name,
         address: address,
-        city: city,
+        fk_city_id: city,
         description: description,
         opening_hours: opening_hours,
         happy_hour: happy_hour,
