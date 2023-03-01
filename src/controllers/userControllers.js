@@ -7,6 +7,28 @@ const {
 const { sequelize } = require("../database/config");
 const { QueryTypes } = require("sequelize");
 
+exports.getAllUsers = async (req, res) => {
+  const [users, metadata] = await sequelize.query(
+    "SELECT id, email FROM users"
+  );
+  return res.json(users);
+};
+
+exports.getUserById = async (req, res) => {
+  const userId = req.params.userIdä;
+  const [user, metadata] = await sequelize.query(
+    "SELECT id, email FROM user WHERE id = $userId",
+    {
+      bind: { userId },
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  if (!user) throw new notFoundError("Den användaren finns inte.");
+
+  return res.json(user);
+};
+
 exports.deleteUserById = async (req, res) => {
   //placera användarId:t i en variabel
   const userId = req.params.userId;
