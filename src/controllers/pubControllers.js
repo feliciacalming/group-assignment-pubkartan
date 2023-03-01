@@ -1,3 +1,4 @@
+const { query } = require("express");
 const { QueryTypes } = require("sequelize");
 const { sequelize } = require("../database/config");
 
@@ -38,6 +39,7 @@ exports.createNewPub = async (req, res) => {
       type: QueryTypes.INSERT,
     }
   );
+  await sequelize.query(``);
   return res
     .setHeader(
       "Location",
