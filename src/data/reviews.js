@@ -71,4 +71,11 @@ exports.reviews = [
     fk_user_id: 2,
     fk_pub_id: 10,
   },
+  {
+    review: "Toppen, blev inte skallad",
+    rating: 4,
+    created_at: "2022-12-14",
+    fk_user_id: 1,
+    fk_pub_id: 1,
+  },
 ];

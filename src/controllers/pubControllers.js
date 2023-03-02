@@ -119,12 +119,41 @@ exports.updatePub = async (req, res) => {
 
 exports.deletePubById = async (req, res) => {
   const pubId = req.params.pubId;
+  const userId = req.user.userId;
 
-  if (req.user.role !== userRoles.ADMIN) {
-    const [userPubRole, userPubRoleMeta] = await sequelize.query(
-      `
+  console.log(pubId);
+  console.log(userId);
 
+  const users_pubs = await sequelize.query(
     `
-    );
+    SELECT * FROM pub WHERE id = $pubId;`,
+    {
+      bind: { pubId: pubId },
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  const pub_reviews = await sequelize.query(
+    `SELECT * FROM review WHERE fk_pub_id = $pubId;`,
+    {
+      bind: { pubId },
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
+    if (pub_reviews.length > 0) {
+      await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {
+        bind: { pubId },
+        type: QueryTypes.DELETE,
+      });
+    }
+    await sequelize.query("DELETE FROM pub WHERE id = $pubId RETURNING *", {
+      bind: { pubId },
+      type: QueryTypes.DELETE,
+    });
+    return res.sendStatus(204);
+  } else {
+    throw new UnauthorizedError("Du kan inte ta bort en pub du inte skapat");
   }
 };
