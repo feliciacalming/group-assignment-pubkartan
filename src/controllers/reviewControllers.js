@@ -44,7 +44,7 @@ exports.updateReview = async (req, res) => {
 
 exports.deleteReviewById = async (req, res) => {
   
-  const ReviewId = req.params.reviewId;
+  const reviewId = req.params.reviewid;
 
   //kolla om användaren är admin || om användaren försöker deleta sig själv
   // if (userId != req.user.userId && req.user.role !== userRoles.ADMIN) {
@@ -60,6 +60,8 @@ exports.deleteReviewById = async (req, res) => {
       bind: { reviewId },
     }
   );
+
+  //console.log(results);
 
   if (!results || results[0]) {
     throw new NotFoundError("Den reviewn finns då icke!");

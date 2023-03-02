@@ -1,9 +1,6 @@
+const bcrypt = require("bcrypt");
 const { userRoles } = require("../constants/users");
-const {
-  notFoundError,
-  UnauthorizedError,
-  NotFoundError,
-} = require("../utils/errors");
+const { UnauthorizedError, NotFoundError } = require("../utils/errors");
 const { sequelize } = require("../database/config");
 const { QueryTypes } = require("sequelize");
 
@@ -28,7 +25,44 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-  console.log("hej");
+  const userId = req.params.userId;
+  const { username, email, password, role, created_at } = req.body;
+
+  if (userId != req.user.userId && req.user.role !== userRoles.ADMIN) {
+    throw new UnauthorizedError(
+      "Du får inte uppdatera för det är inte ditt konto å du är då inte admin heller!"
+    );
+  } else {
+    const salt = await bcrypt.genSalt(10);
+    const hashedpassword = await bcrypt.hash(password, salt);
+
+    await sequelize.query(
+      `UPDATE user SET username=$username, email=$email, password=$password, role=$role, created_at=$created_at WHERE id = $userId RETURNING *;`,
+      {
+        bind: {
+          userId: userId,
+          username: username,
+          email: email,
+          password: hashedpassword,
+          role: role,
+          created_at: created_at,
+        },
+        type: QueryTypes.UPDATE,
+      }
+    );
+
+    const [updatedUser, metadata] = await sequelize.query(
+      `SELECT * FROM user WHERE id = $userId;`,
+      {
+        bind: {
+          userId,
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    return res.status(200).json(updatedUser);
+  }
 };
 
 exports.deleteUserById = async (req, res) => {
