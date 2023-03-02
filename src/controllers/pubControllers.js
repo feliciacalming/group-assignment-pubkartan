@@ -2,6 +2,7 @@ const { query } = require("express");
 const { QueryTypes } = require("sequelize");
 const { NotFoundError } = require("../utils/errors");
 const { sequelize } = require("../database/config");
+const { userRoles } = require("../constants/users");
 
 exports.getAllPubs = async (req, res) => {
   const [pubs, metadata] = await sequelize.query(`SELECT * FROM pub`);
@@ -97,5 +98,13 @@ exports.updatePub = async (req, res) => {
 };
 
 exports.deletePubById = async (req, res) => {
-  console.log("hej");
+  const pubId = req.params.pubId;
+
+  if (req.user.role !== userRoles.ADMIN) {
+    const [userPubRole, userPubRoleMeta] = await sequelize.query(
+      `
+
+    `
+    );
+  }
 };
