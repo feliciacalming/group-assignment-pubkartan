@@ -1,6 +1,7 @@
 require("dotenv").config();
 require("express-async-errors");
 const express = require("express");
+const helmet = require("helmet");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const pubRoutes = require("./routes/pubRoutes");
@@ -12,6 +13,7 @@ const { sequelize } = require("./database/config");
 
 /* ----------- Create our Expres app ------------ */
 const app = express();
+app.use(helmet());
 
 /* ---------------------------------------------- */
 /* ----------------- Middleware ----------------- */
