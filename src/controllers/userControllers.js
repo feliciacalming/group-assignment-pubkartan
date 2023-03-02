@@ -5,19 +5,27 @@ const { sequelize } = require("../database/config");
 const { QueryTypes } = require("sequelize");
 
 exports.getAllUsers = async (req, res) => {
-  const [users, metadata] = await sequelize.query("SELECT id, email FROM user");
-  return res.json(users);
+  if (req.user.role != userRoles.ADMIN) {
+    throw new UnauthorizedError(
+      "Du är inte admin så du får inte hämta alla users!"
+    );
+  }
+  const [users, metadata] = await sequelize.query("SELECT * FROM user ");
+
+  return res.status(200).json(users);
 };
 
 exports.getUserById = async (req, res) => {
   const userId = req.params.userId;
-  const [user, metadata] = await sequelize.query(
-    `SELECT id, email FROM user WHERE id = $userId`,
+  const user = await sequelize.query(
+    `SELECT review FROM review WHERE fk_user_id = (SELECT id FROM user WHERE id = $userId);`,
     {
       bind: { userId },
       type: QueryTypes.SELECT,
     }
   );
+
+  console.log(user);
 
   if (!user) throw new NotFoundError("Den användaren finns inte.");
 
