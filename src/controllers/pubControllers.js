@@ -92,6 +92,8 @@ exports.updatePub = async (req, res) => {
     }
   );
 
+  if (!users_pubs) throw new NotFoundError("Den här puben finns inte!");
+
   if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
     const [updatedPub, metadata] = await sequelize.query(
       `UPDATE pub SET name=$name, address=$address, fk_city_id=$fk_city_id, description=$description, opening_hours=$opening_hours, happy_hour=$happy_hour, beer_price=$beer_price, webpage=$webpage, fk_user_id=$fk_user_id WHERE id = $pubId RETURNING *;`,
@@ -124,7 +126,7 @@ exports.deletePubById = async (req, res) => {
   console.log(pubId);
   console.log(userId);
 
-  const users_pubs = await sequelize.query(
+  const [users_pubs] = await sequelize.query(
     `
     SELECT * FROM pub WHERE id = $pubId;`,
     {
@@ -133,23 +135,27 @@ exports.deletePubById = async (req, res) => {
     }
   );
 
+  if (!users_pubs) throw new NotFoundError("Den här puben finns inte!");
+
   const pub_reviews = await sequelize.query(
     `SELECT * FROM review WHERE fk_pub_id = $pubId;`,
     {
-      bind: { pubId },
+      bind: { pubId: pubId },
       type: QueryTypes.SELECT,
     }
   );
 
+  console.log(pub_reviews);
+
   if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
     if (pub_reviews.length > 0) {
       await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {
-        bind: { pubId },
+        bind: { pubId: pubId },
         type: QueryTypes.DELETE,
       });
     }
     await sequelize.query("DELETE FROM pub WHERE id = $pubId RETURNING *", {
-      bind: { pubId },
+      bind: { pubId: pubId },
       type: QueryTypes.DELETE,
     });
     return res.sendStatus(204);
