@@ -1,6 +1,10 @@
 const { query } = require("express");
 const { QueryTypes } = require("sequelize");
-const { NotFoundError } = require("../utils/errors");
+const {
+  NotFoundError,
+  UnauthenticatedError,
+  UnauthorizedError,
+} = require("../utils/errors");
 const { sequelize } = require("../database/config");
 const { userRoles } = require("../constants/users");
 
@@ -34,8 +38,12 @@ exports.createNewPub = async (req, res) => {
     webpage,
   } = req.body;
 
+  const userId = req.user.userId;
+
+  console.log(userId);
+
   const [newPubId] = await sequelize.query(
-    `INSERT INTO pub (name, address, fk_city_id, description, opening_hours, happy_hour, beer_price, webpage, fk_user_id) VALUES ($name, $address, $fk_city_id, $description, $opening_hours, $happy_hour, $beer_price, $webpage, fk_user_id);`,
+    `INSERT INTO pub (name, address, fk_city_id, description, opening_hours, happy_hour, beer_price, webpage, fk_user_id) VALUES ($name, $address, $fk_city_id, $description, $opening_hours, $happy_hour, $beer_price, $webpage, $fk_user_id);`,
     {
       bind: {
         name: name,
@@ -46,11 +54,12 @@ exports.createNewPub = async (req, res) => {
         happy_hour: happy_hour,
         beer_price: beer_price,
         webpage: webpage,
+        fk_user_id: userId,
       },
       type: QueryTypes.INSERT,
     }
   );
-  await sequelize.query(``);
+
   return res
     .setHeader(
       "Location",
@@ -73,28 +82,39 @@ exports.updatePub = async (req, res) => {
     webpage,
   } = req.body;
 
-  const [updatedPub, metadata] = await sequelize.query(
-    `UPDATE pub SET name=$name, address=$address, city=$city, description=$description, opening_hours=$opening_hours, happy_hour=$happy_hour, beer_price=$beer_price, webpage=$webpage WHERE id = $pubId RETURNING *;`,
+  const userId = req.user.userId;
+  const [users_pubs] = await sequelize.query(
+    `
+    SELECT * FROM pub WHERE id = $pubId;`,
     {
-      bind: {
-        pubId: pubId,
-        name: name,
-        address: address,
-        city: city,
-        description: description,
-        opening_hours: opening_hours,
-        happy_hour: happy_hour,
-        beer_price: beer_price,
-        webpage: webpage,
-      },
-      type: QueryTypes.UPDATE,
+      bind: { pubId: pubId },
+      type: QueryTypes.SELECT,
     }
   );
 
-  if (!updatedPub)
-    throw new NotFoundError("Du försöker uppdatera en pub som inte finns??");
-
-  return res.status(200).json(updatedPub);
+  if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
+    const [updatedPub, metadata] = await sequelize.query(
+      `UPDATE pub SET name=$name, address=$address, fk_city_id=$fk_city_id, description=$description, opening_hours=$opening_hours, happy_hour=$happy_hour, beer_price=$beer_price, webpage=$webpage, fk_user_id=$fk_user_id WHERE id = $pubId RETURNING *;`,
+      {
+        bind: {
+          pubId: pubId,
+          name: name,
+          address: address,
+          fk_city_id: city,
+          description: description,
+          opening_hours: opening_hours,
+          happy_hour: happy_hour,
+          beer_price: beer_price,
+          webpage: webpage,
+          fk_user_id: userId,
+        },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    return res.status(200).json(updatedPub);
+  } else {
+    throw new UnauthorizedError("Du kan inte ändra en pub du inte skapat");
+  }
 };
 
 exports.deletePubById = async (req, res) => {

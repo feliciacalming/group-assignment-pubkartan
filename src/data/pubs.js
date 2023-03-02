@@ -29,7 +29,7 @@ exports.pubs = [
     opening_hours: "16-02",
     happy_hour: "14-18",
     beer_price: 42,
-    webpage: "",
+    webpage: "https://skalgbg.se",
     fk_user_id: 1,
   },
   {
@@ -40,7 +40,7 @@ exports.pubs = [
     opening_hours: "15-02",
     happy_hour: "15-18",
     beer_price: 45,
-    webpage: "svea.retrobar.se",
+    webpage: "https://svea.retrobar.se",
     fk_user_id: 3,
   },
   {
@@ -51,7 +51,7 @@ exports.pubs = [
     opening_hours: "14-01",
     happy_hour: "16-18",
     beer_price: 25,
-    webpage: "",
+    webpage: "https://km7.se",
     fk_user_id: 2,
   },
   {
@@ -62,7 +62,7 @@ exports.pubs = [
     opening_hours: "15-02",
     happy_hour: "16-19",
     beer_price: 39,
-    webpage: "svea.retrobar.se",
+    webpage: "https://balthazar.se",
     fk_user_id: 3,
   },
   {
@@ -73,18 +73,18 @@ exports.pubs = [
     opening_hours: "15-02",
     happy_hour: "17-20",
     beer_price: 49,
-    webpage: "tre-vanner.se",
+    webpage: "https://tre-vanner.se",
     fk_user_id: 2,
   },
   {
     name: "Hank's Heaven",
-    address: 1,
+    address: "Högdalsgången 5",
     fk_city_id: 1,
     description: "Kvarterskrog, när kvarterskrog är som mest kvarterskrog",
     opening_hours: "11-sent",
     happy_hour: "Ja",
     beer_price: 37,
-    webpage: "",
+    webpage: "https://hanksheaven.se",
     fk_user_id: 2,
   },
   {
@@ -95,7 +95,7 @@ exports.pubs = [
     opening_hours: "15-03",
     happy_hour: "16-18",
     beer_price: 62,
-    webpage: "harrys.se",
+    webpage: "https://harrys.se/kalmar",
     fk_user_id: 2,
   },
   {
@@ -106,7 +106,7 @@ exports.pubs = [
     opening_hours: "14-01",
     happy_hour: "16-18",
     beer_price: 42,
-    webpage: "danskengbg.se",
+    webpage: "https://danskengbg.se",
     fk_user_id: 1,
   },
 ];
