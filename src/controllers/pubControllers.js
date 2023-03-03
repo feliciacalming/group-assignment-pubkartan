@@ -10,14 +10,15 @@ const { userRoles } = require("../constants/users");
 exports.getAllPubs = async (req, res) => {
   let city = req.query.city;
   let limit = req.query.limit || 10;
+  let pubs;
 
   if (!city) {
-    let pubs = await sequelize.query(
+    pubs = await sequelize.query(
       `SELECT pub.name, pub.address, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage FROM pub LIMIT $limit;`,
       { bind: { limit } }
     );
 
-    return res.json(pubs);
+    // return res.json(pubs);
   } else {
     pubs = await sequelize.query(
       `SELECT pub.name, pub.address, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage, city.city_name FROM pub LEFT JOIN city ON city.id = pub.fk_city_id WHERE city.city_name = $city LIMIT $limit;`,
@@ -25,7 +26,7 @@ exports.getAllPubs = async (req, res) => {
     );
   }
 
-  return res.json(pubs);
+  return res.status(200).json(pubs);
 };
 
 exports.getPubById = async (req, res) => {
