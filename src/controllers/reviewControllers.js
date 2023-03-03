@@ -60,6 +60,8 @@ exports.deleteReviewById = async (req, res) => {
     );
     return res.sendStatus(204);
   } else {
-    throw new UnauthorizedError("Du kan inte ta bort en review du inte skapat");
+    throw new UnauthorizedError(
+      "⛔ Du har inte befogenhet att ta bort denna recensionen! ⛔"
+    );
   }
 };

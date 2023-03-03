@@ -30,17 +30,28 @@ exports.getAllPubs = async (req, res) => {
 };
 
 exports.getPubById = async (req, res) => {
-  const [pub, metadata] = await sequelize.query(
-    `SELECT * FROM pub WHERE id = $pubId`,
+  const pubId = req.params.pubId;
+  const pub = await sequelize.query(`SELECT * FROM pub WHERE id = $pubId`, {
+    bind: { pubId },
+    type: QueryTypes.SELECT,
+  });
+
+  const pubReviews = await sequelize.query(
+    `SELECT review.id, review.review, review.rating, review.created_at, user.username AS username FROM review JOIN user ON pub.id = review.fk_pub_id JOIN pub ON user.id = review.fk_user_id WHERE pub.id = $pubId;`,
     {
       bind: { pubId },
       type: QueryTypes.SELECT,
     }
   );
 
-  if (!pub) throw new NotFoundError("Den puben finns inte!!!!");
+  if (!pub) throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
 
-  return res.status(200).json(pub);
+  const response = {
+    pub: pub,
+    reviews: [pubReviews],
+  };
+
+  return res.status(200).json(response);
 };
 
 exports.createNewPub = async (req, res) => {
@@ -56,8 +67,6 @@ exports.createNewPub = async (req, res) => {
   } = req.body;
 
   const userId = req.user.userId;
-
-  console.log(userId);
 
   const [newPubId] = await sequelize.query(
     `INSERT INTO pub (name, address, fk_city_id, description, opening_hours, happy_hour, beer_price, webpage, fk_user_id) VALUES ($name, $address, $fk_city_id, $description, $opening_hours, $happy_hour, $beer_price, $webpage, $fk_user_id);`,
@@ -109,7 +118,8 @@ exports.updatePub = async (req, res) => {
     }
   );
 
-  if (!users_pubs) throw new NotFoundError("Den här puben finns inte!");
+  if (!users_pubs)
+    throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
 
   if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
     const [updatedPub, metadata] = await sequelize.query(
@@ -132,7 +142,9 @@ exports.updatePub = async (req, res) => {
     );
     return res.status(200).json(updatedPub);
   } else {
-    throw new UnauthorizedError("Du kan inte ändra en pub du inte skapat");
+    throw new UnauthorizedError(
+      "⛔ Du har inte befogenhet att uppdatera denna pub! ⛔"
+    );
   }
 };
 
@@ -152,7 +164,8 @@ exports.deletePubById = async (req, res) => {
     }
   );
 
-  if (!users_pubs) throw new NotFoundError("Den här puben finns inte!");
+  if (!users_pubs)
+    throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
 
   const pub_reviews = await sequelize.query(
     `SELECT * FROM review WHERE fk_pub_id = $pubId;`,
@@ -177,6 +190,8 @@ exports.deletePubById = async (req, res) => {
     });
     return res.sendStatus(204);
   } else {
-    throw new UnauthorizedError("Du kan inte ta bort en pub du inte skapat");
+    throw new UnauthorizedError(
+      "⛔ Du har inte befogenhet att ta bort denna pub! ⛔"
+    );
   }
 };
