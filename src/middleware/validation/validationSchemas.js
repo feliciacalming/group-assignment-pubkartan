@@ -1,30 +1,38 @@
 const { body } = require("express-validator");
 
 exports.registerSchema = [
-  body("email").isEmail().withMessage("You must provide a valid email address"),
+  body("email")
+    .isEmail()
+    .withMessage("✉️ Du måste ange en korrekt e-mailadress ✉️"),
   body("password")
     .not()
     .isEmpty()
     .isLength({ min: 5 })
-    .withMessage(
-      "You must provide a password that is at least 5 characters long"
-    ),
+    .withMessage("🔐 Du måste ange ett lösenord som är minst 5 tecken 🔐"),
 ];
 
 exports.loginSchema = [
-  body("email").isEmail().withMessage("You must provide a valid email address"),
-  body("password").not().isEmpty().withMessage("You must provide a password"),
+  body("email")
+    .isEmail()
+    .withMessage("✉️ Du måste ange en korrekt e-mailadress ✉️"),
+  body("password")
+    .not()
+    .isEmpty()
+    .withMessage("🔐 Du måste ange ett lösenord 🔐"),
 ];
 
 exports.reviewSchema = [
-  body("review")
-    .not()
-    .isEmpty()
-    .isLength({ min: 5, max: 250 })
-    .withMessage("Your review must be between 5 and 250 characters"),
   body("rating")
     .not()
     .isEmpty()
     .isInt({ min: 1, max: 5 })
-    .withMessage("You must provide a rating between 1 and 5"),
+    .withMessage("⛔ Ditt betyg måste vara mellan 1-5 ⛔"),
+];
+
+exports.pubSchema = [
+  body("name")
+    .not()
+    .isEmpty()
+    .isLength({ min: 1, max: 25 })
+    .withMessage("💃🏻 Du måste ange ett namn på puben! 💃🏻"),
 ];

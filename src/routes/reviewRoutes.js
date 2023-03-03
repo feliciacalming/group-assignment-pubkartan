@@ -7,11 +7,16 @@ const {
   createNewReview,
   deleteReviewById,
 } = require("../controllers/reviewControllers");
+const { validate } = require("../middleware/validation/validationMiddleware");
+const { reviewSchema } = require("../middleware/validation/validationSchemas");
 
-// POST Create a new review /api/v1/reviews/
-router.post("/:pubId", isAuthenticated, createNewReview);
+router.post(
+  "/:pubId",
+  validate(reviewSchema),
+  isAuthenticated,
+  createNewReview
+);
 
-// DELETE review by Id /api/v1/reviews/:reviewid
 router.delete("/:reviewId", isAuthenticated, deleteReviewById);
 
 module.exports = router;
