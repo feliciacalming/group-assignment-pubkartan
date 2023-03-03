@@ -14,7 +14,7 @@ const {
 router.get("/", isAuthenticated, getAllUsers);
 
 // GET User by Id /api/v1/users/:userid
-router.get("/:userId", isAuthenticated, getUserById);
+router.get("/:userId", getUserById);
 
 // PUT Update user by Id /api/v1/users/:userid
 // VI HADE INTE MED DENNA MEN BEHÖVER VI INTE KUNN AUPPDATERA EN USER MED ÄNDRINGAR
