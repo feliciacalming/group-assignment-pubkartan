@@ -9,7 +9,7 @@ const {
 } = require("../controllers/reviewControllers");
 
 // POST Create a new review /api/v1/reviews/
-router.post("/", isAuthenticated, createNewReview);
+router.post("/:pubId", isAuthenticated, createNewReview);
 
 // DELETE review by Id /api/v1/reviews/:reviewid
 router.delete("/:reviewId", isAuthenticated, deleteReviewById);

@@ -25,7 +25,7 @@ exports.getUserById = async (req, res) => {
     }
   );
   const userReviews = await sequelize.query(
-    `SELECT review.review, review.rating, review.created_at, pub.name AS pub_name FROM review JOIN pub ON pub.id = review.fk_pub_id JOIN user ON user.id = review.fk_user_id WHERE user.id = $userId;`,
+    `SELECT review.id, review.review, review.rating, review.created_at, pub.name AS pub_name FROM review JOIN pub ON pub.id = review.fk_pub_id JOIN user ON user.id = review.fk_user_id WHERE user.id = $userId;`,
     {
       bind: { userId },
       type: QueryTypes.SELECT,
