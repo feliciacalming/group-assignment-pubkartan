@@ -22,4 +22,9 @@ exports.reviewSchema = [
     .isEmpty()
     .isLength({ min: 5, max: 250 })
     .withMessage("Your review must be between 5 and 250 characters"),
+  body("rating")
+    .not()
+    .isEmpty()
+    .isInt({ min: 1, max: 5 })
+    .withMessage("You must provide a rating between 1 and 5"),
 ];
