@@ -17,17 +17,16 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   const userId = req.params.userId;
+
   const user = await sequelize.query(
-    `SELECT review FROM review WHERE fk_user_id = (SELECT id FROM user WHERE id = $userId);`,
+    `SELECT user.username, review.review FROM review JOIN user ON user.id = review.fk_user_id WHERE user.id = $userId;`,
     {
       bind: { userId },
       type: QueryTypes.SELECT,
     }
   );
 
-  console.log(user);
-
-  if (!user) throw new NotFoundError("Den användaren finns inte.");
+  if (user.length <= 0) throw new NotFoundError("Den användaren finns inte.");
 
   return res.json(user);
 };
