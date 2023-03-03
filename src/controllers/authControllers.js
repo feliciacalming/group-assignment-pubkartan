@@ -2,23 +2,20 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { sequelize } = require("../database/config");
 const { QueryTypes } = require("sequelize");
-const { UnauthenticatedError } = require("../utils/errors");
+const { UnauthenticatedError, UnauthorizedError } = require("../utils/errors");
 const { userRoles } = require("../constants/users");
 
 exports.register = async (req, res) => {
-  //det man skriver in som email och lösenord
   const { username, email, password } = req.body;
 
   //kryptera det önskade lösenordet
   const salt = await bcrypt.genSalt(10);
   const hashedpassword = await bcrypt.hash(password, salt);
 
-  //kolla om databasen är tom eller inte
   const [result, metadata] = await sequelize.query(
     "SELECT id FROM user LIMIT 1"
   );
 
-  //lägg till användare till databasen (gör till admin om det är första användaren)
   if (!result || result.length < 1) {
     await sequelize.query(
       "INSERT INTO user (username, email, password, role, created_at) VALUES ($username, $email, $password, $role, $created_at)",
@@ -46,16 +43,14 @@ exports.register = async (req, res) => {
     );
   }
 
-  return res
-    .status(201)
-    .json({ message: "du skapade ett konto! logga in nu för fan!" });
+  return res.status(201).json({
+    message: "🔥 Ditt konto är skapat, logga in och hitta dina bästa pubar! 🔥",
+  });
 };
 
 exports.login = async (req, res) => {
-  //mail och lösen man skriver när man loggar in
   const { email, password: candidatePassword } = req.body;
 
-  //kolla om det finns en användare med den mailen
   const [user, metadata] = await sequelize.query(
     `SELECT * FROM user WHERE email = $email LIMIT 1;`,
     {
@@ -64,16 +59,15 @@ exports.login = async (req, res) => {
     }
   );
 
-  if (!user) throw new UnauthenticatedError("Den här användaren finns inte");
+  if (!user) throw new UnauthorizedError();
 
-  //kolla om lösenordet är korrekt
   const isPasswordCorrect = await bcrypt.compare(
     candidatePassword,
     user.password
   );
 
-  if (!isPasswordCorrect) throw new UnauthenticatedError("Fel lösenord!!!");
-  /* ändra sen till nåt annat felmeddelande så det inte är tydligt om det är mail lr lösen som är fel */
+  if (!isPasswordCorrect)
+    throw new UnauthenticatedError("⛔ Inloggning misslyckades ⛔");
 
   const jwtPayload = {
     userId: user.id,
@@ -88,6 +82,6 @@ exports.login = async (req, res) => {
   return res.json({
     token: jwtToken,
     user: jwtPayload,
-    message: "Du är inloggad!",
+    message: "🚀 Du är inloggad!",
   });
 };
