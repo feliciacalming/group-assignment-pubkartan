@@ -7,7 +7,7 @@ const { userRoles } = require("../constants/users");
 
 exports.register = async (req, res) => {
   //det man skriver in som email och lösenord
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
 
   //kryptera det önskade lösenordet
   const salt = await bcrypt.genSalt(10);
@@ -21,22 +21,26 @@ exports.register = async (req, res) => {
   //lägg till användare till databasen (gör till admin om det är första användaren)
   if (!result || result.length < 1) {
     await sequelize.query(
-      "INSERT INTO user (email, password, role) VALUES ($email, $password, $role)",
+      "INSERT INTO user (username, email, password, role, created_at) VALUES ($username, $email, $password, $role, $created_at)",
       {
         bind: {
+          username: username,
           email: email,
           password: hashedpassword,
           role: userRoles.ADMIN,
+          created_at: new Date().toLocaleDateString(),
         },
       }
     );
   } else {
     await sequelize.query(
-      "INSERT INTO user (email, password) VALUES ($email, $password)",
+      "INSERT INTO user (username, email, password, created_at) VALUES ($username, $email, $password, $created_at)",
       {
         bind: {
+          username: username,
           email: email,
           password: hashedpassword,
+          created_at: new Date().toLocaleDateString(),
         },
       }
     );

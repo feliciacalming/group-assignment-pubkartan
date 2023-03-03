@@ -2,7 +2,7 @@ const { userRoles, pubRoles } = require("../constants/users");
 
 exports.users = [
   {
-    username: "felle",
+    username: "kitchenfan91",
     email: "felicia.calming@gmail.com",
     password: "banan",
     role: userRoles.ADMIN,
@@ -10,28 +10,28 @@ exports.users = [
   },
 
   {
-    username: "adam",
+    username: "cornylover_92",
     email: "adam.danielsson@gmail.com",
     password: "banan",
     role: userRoles.USER,
     created_at: "2023-02-24",
   },
   {
-    username: "johan",
+    username: "strangbang2",
     email: "johan.strang@gmail.com",
     password: "banan",
     role: userRoles.USER,
     created_at: "2023-02-25",
   },
   {
-    username: "per",
+    username: "homeburntboy93",
     email: "per.berge@gmail.com",
     password: "banan",
     role: userRoles.USER,
     created_at: "2023-02-28",
   },
   {
-    username: "max",
+    username: "rbvatklosterallweek",
     email: "max.karlsson@gmail.com",
     password: "banan",
     role: userRoles.USER,

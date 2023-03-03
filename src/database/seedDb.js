@@ -67,8 +67,6 @@ const seedPubsDb = async () => {
 
     await sequelize.query(userInsertQuery);
 
-    //city
-
     await sequelize.query(`
     CREATE TABLE IF NOT EXISTS city (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -91,7 +89,6 @@ const seedPubsDb = async () => {
 
       const variables = [city.city_name];
       cityInsertQueryVariables = [...cityInsertQueryVariables, ...variables];
-      console.log(cityInsertQueryVariables);
     });
 
     cityInsertQuery += ";";
@@ -99,8 +96,6 @@ const seedPubsDb = async () => {
     await sequelize.query(cityInsertQuery, {
       bind: cityInsertQueryVariables,
     });
-
-    /************ Pubs ***********/
 
     let pubInsertQuery =
       "INSERT INTO pub (name, address, fk_city_id, description, opening_hours, happy_hour, beer_price, webpage, fk_user_id) VALUES ";
@@ -136,9 +131,6 @@ const seedPubsDb = async () => {
       bind: pubInsertQueryVariables,
     });
 
-    /************ Reviews ***********/
-
-    // Create review table
     await sequelize.query(`
      CREATE TABLE IF NOT EXISTS review (
        id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -188,10 +180,8 @@ const seedPubsDb = async () => {
 
     console.log("Database successfully populated with data...");
   } catch (error) {
-    // Log eny eventual errors to Terminal
     console.error(error);
   } finally {
-    // End Node process
     process.exit(0);
   }
 };
