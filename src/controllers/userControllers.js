@@ -7,7 +7,7 @@ const { QueryTypes } = require("sequelize");
 exports.getAllUsers = async (req, res) => {
   if (req.user.role != userRoles.ADMIN) {
     throw new UnauthorizedError(
-      "Du är inte admin så du får inte hämta alla users!"
+      "⛔ Du har inte befogenhet att hämta alla användare! ⛔"
     );
   }
   const [users, metadata] = await sequelize.query("SELECT * FROM user ");
@@ -27,7 +27,8 @@ exports.getUserById = async (req, res) => {
 
   console.log(user);
 
-  if (!user) throw new NotFoundError("Den användaren finns inte.");
+  if (!user)
+    throw new NotFoundError("☠️ Det finns ingen användare med det id:t ☠️");
 
   return res.json(user);
 };
@@ -38,7 +39,7 @@ exports.updateUser = async (req, res) => {
 
   if (userId != req.user.userId && req.user.role !== userRoles.ADMIN) {
     throw new UnauthorizedError(
-      "Du får inte uppdatera för det är inte ditt konto å du är då inte admin heller!"
+      "⛔ Du har inte befogenhet att uppdatera detta konto ⛔"
     );
   } else {
     const salt = await bcrypt.genSalt(10);
@@ -74,17 +75,14 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.deleteUserById = async (req, res) => {
-  //placera användarId:t i en variabel
   const userId = req.params.userId;
 
-  //kolla om användaren är admin || om användaren försöker deleta sig själv
   if (userId != req.user.userId && req.user.role !== userRoles.ADMIN) {
     throw new UnauthorizedError(
-      "Du är inte authorized till att ta bort den här!!"
+      "⛔ Du har inte befogenhet att radera detta konto ⛔"
     );
   }
 
-  //ta bort användaren från databasen
   const [results, metadata] = await sequelize.query(
     "DELETE FROM user WHERE id = $userId RETURNING *",
     {
@@ -93,7 +91,7 @@ exports.deleteUserById = async (req, res) => {
   );
 
   if (!results || results[0]) {
-    throw new NotFoundError("Den användaren finns då icke!");
+    throw new NotFoundError("☠️ Den här användaren finns inte ☠️");
   }
 
   return res.sendStatus(204);
