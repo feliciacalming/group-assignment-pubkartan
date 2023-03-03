@@ -18,19 +18,29 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   const userId = req.params.userId;
   const user = await sequelize.query(
-    `SELECT review FROM review WHERE fk_user_id = (SELECT id FROM user WHERE id = $userId);`,
+    `SELECT username, email FROM user WHERE user.id = $userId;`,
+    {
+      bind: { userId },
+      type: QueryTypes.SELECT,
+    }
+  );
+  const userReviews = await sequelize.query(
+    `SELECT review.review, review.rating, review.created_at, pub.name AS pub_name FROM review JOIN pub ON pub.id = review.fk_pub_id JOIN user ON user.id = review.fk_user_id WHERE user.id = $userId;`,
     {
       bind: { userId },
       type: QueryTypes.SELECT,
     }
   );
 
-  console.log(user);
-
-  if (!user)
+  if (user.length == 0)
     throw new NotFoundError("☠️ Det finns ingen användare med det id:t ☠️");
 
-  return res.json(user);
+  const response = {
+    user: user,
+    reviews: [userReviews],
+  };
+
+  return res.json(response);
 };
 
 exports.updateUser = async (req, res) => {
