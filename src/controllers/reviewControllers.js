@@ -1,7 +1,12 @@
 const { query } = require("express");
 const { QueryTypes } = require("sequelize");
-const { NotFoundError } = require("../utils/errors");
+const {
+  NotFoundError,
+  UnauthenticatedError,
+  UnauthorizedError,
+} = require("../utils/errors");
 const { sequelize } = require("../database/config");
+const { userRoles } = require("../constants/users");
 
 exports.createNewReview = async (req, res) => {
   const {
@@ -38,34 +43,39 @@ exports.createNewReview = async (req, res) => {
 
 
 
-exports.updateReview = async (req, res) => {
-  console.log("updateReview");
-};
+//exports.updateReview = async (req, res) => {
+//  console.log("updateReview");
+// };
+
 
 exports.deleteReviewById = async (req, res) => {
-  
   const reviewId = req.params.reviewid;
+  const userId = req.user.userId;
 
-  //kolla om användaren är admin || om användaren försöker deleta sig själv
-  // if (userId != req.user.userId && req.user.role !== userRoles.ADMIN) {
-  //   throw new UnauthorizedError(
-  //     "Du är inte authorized till att ta bort den här!!"
-  //   );
-  // }
+  //console.log(reviewId);
+  //console.log(userId);
 
-  //ta bort användaren från databasen
-  const [results, metadata] = await sequelize.query(
-    "DELETE FROM review WHERE id = $reviewId RETURNING *",
+  const [result_reviews] = await sequelize.query(
+    `
+    SELECT * FROM review WHERE id = $reviewId;`,
     {
-      bind: { reviewId },
+      bind: { reviewId: reviewId },
+      type: QueryTypes.SELECT,
     }
   );
 
-  //console.log(results);
+  if (!result_reviews) throw new NotFoundError("Den här reviewn finns inte!");
 
-  if (!results || results[0]) {
-    throw new NotFoundError("Den reviewn finns då icke!");
+
+  if (req.user.role == userRoles.ADMIN || userId == result_reviews.fk_user_id) {
+
+    await sequelize.query("DELETE FROM review WHERE id = $reviewId RETURNING *", {
+      bind: { reviewId: reviewId },
+      type: QueryTypes.DELETE,
+
+    });
+    return res.sendStatus(204);
+  } else {
+    throw new UnauthorizedError("Du kan inte ta bort en review du inte skapat");
   }
-
-  return res.sendStatus(204);
 };
