@@ -17,12 +17,12 @@ exports.getAllPubs = async (req, res) => {
       `SELECT pub.name, pub.address, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage FROM pub LIMIT $limit;`,
       { bind: { limit } }
     );
-
-    // return res.json(pubs);
   } else {
+    city = city[0].toUpperCase() + city.substring(1).toLowerCase();
+
     pubs = await sequelize.query(
       `SELECT pub.name, pub.address, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage, city.city_name FROM pub LEFT JOIN city ON city.id = pub.fk_city_id WHERE city.city_name = $city LIMIT $limit;`,
-      { bind: { city, limit } }
+      { bind: { city: city.trim(), limit } }
     );
   }
 
