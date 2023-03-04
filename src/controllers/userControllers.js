@@ -10,9 +10,17 @@ exports.getAllUsers = async (req, res) => {
       "⛔ Du har inte befogenhet att hämta alla användare! ⛔"
     );
   }
-  const [users, metadata] = await sequelize.query("SELECT * FROM user ");
+  const [users] = await sequelize.query(
+    "SELECT * FROM user ORDER BY created_at DESC;"
+  );
 
-  return res.status(200).json(users);
+  const response = {
+    users: users,
+    total: users.length,
+  };
+
+  console.log(response);
+  return res.status(200).json(response);
 };
 
 exports.getUserById = async (req, res) => {
