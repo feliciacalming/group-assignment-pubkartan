@@ -44,8 +44,8 @@ exports.getUserById = async (req, res) => {
     throw new NotFoundError("☠️ Det finns ingen användare med det id:t ☠️");
 
   const response = {
-    user: user,
-    reviews: [userReviews],
+    user,
+    reviews: userReviews,
   };
 
   return res.json(response);
