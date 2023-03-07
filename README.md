@@ -73,5 +73,5 @@ Clone this repo and open it in an editor such as VS Code.
 5. Create an .env-file at the root of the directory and add the following:
    ```bash
    PORT = 3000
-   JWT_SECRET = "dSgVkYp3s6v9y/B?E(H+MbQeThWmZq4t"
+   JWT_SECRET = XXXX
    ```
