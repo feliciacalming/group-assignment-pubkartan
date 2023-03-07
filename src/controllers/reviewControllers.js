@@ -26,14 +26,19 @@ exports.createNewReview = async (req, res) => {
       },
       type: QueryTypes.INSERT,
     }
-  );
-  return res
+    );
+    return res
+    .send(
+      "🔥 Du har skapen en ny recension 🔥")
+    .sendStatus(201)
     .setHeader(
       "Location",
       `${req.protocol}://${req.headers.host}/api/v1/reviews/${newReviewId}`
     )
-    .sendStatus(201);
-};
+
+  };
+    // .sendStatus(201);
+
 
 exports.deleteReviewById = async (req, res) => {
   const reviewId = req.params.reviewId;
@@ -58,7 +63,13 @@ exports.deleteReviewById = async (req, res) => {
         type: QueryTypes.DELETE,
       }
     );
-    return res.sendStatus(204);
+    
+    return res.status(200).json({
+      message: "😱 Du har FÖR ALLTID tagit BOrt REceNsION 😱",
+    });
+  
+    
+    // return res.sendStatus(204);
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att ta bort denna recensionen! ⛔"

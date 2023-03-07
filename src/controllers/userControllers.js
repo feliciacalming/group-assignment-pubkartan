@@ -111,6 +111,6 @@ exports.deleteUserById = async (req, res) => {
   if (!results || results[0]) {
     throw new NotFoundError("☠️ Den här användaren finns inte ☠️");
   }
-
   return res.sendStatus(204);
+
 };

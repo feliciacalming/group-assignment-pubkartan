@@ -125,11 +125,16 @@ exports.createNewPub = async (req, res) => {
 
   console.log(newPubId);
   return res
+  .send(
+    "🔥 Wohoo du har skapat en ny pub 🔥")
+    .sendStatus(201)
     .setHeader(
       "Location",
       `${req.protocol}://${req.headers.host}/api/v1/pubs/${newPubId}`
     )
-    .sendStatus(201);
+    
+     
+    // .sendStatus(201);
 };
 
 exports.updatePub = async (req, res) => {
@@ -226,7 +231,12 @@ exports.deletePubById = async (req, res) => {
       bind: { pubId: pubId },
       type: QueryTypes.DELETE,
     });
-    return res.sendStatus(204);
+
+    return res.status(200).json({
+      message: "😱 Du har FÖR ALLTID tagit BOrt baren 😱",
+    });
+
+    // return res.sendStatus(204);
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att ta bort denna pub! ⛔"
