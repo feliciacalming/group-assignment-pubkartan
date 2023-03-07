@@ -53,7 +53,7 @@ exports.getUserById = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const userId = req.params.userId;
-  const { username, email, password, role, created_at } = req.body;
+  const { username, email, password } = req.body;
 
   if (userId != req.user.userId && req.user.role !== userRoles.ADMIN) {
     throw new UnauthorizedError(
@@ -64,15 +64,13 @@ exports.updateUser = async (req, res) => {
     const hashedpassword = await bcrypt.hash(password, salt);
 
     await sequelize.query(
-      `UPDATE user SET username=$username, email=$email, password=$password, role=$role, created_at=$created_at WHERE id = $userId RETURNING *;`,
+      `UPDATE user SET username=$username, email=$email, password=$password WHERE id = $userId RETURNING *;`,
       {
         bind: {
           userId: userId,
           username: username,
           email: email,
           password: hashedpassword,
-          role: role,
-          created_at: created_at,
         },
         type: QueryTypes.UPDATE,
       }
@@ -111,6 +109,6 @@ exports.deleteUserById = async (req, res) => {
   if (!results || results[0]) {
     throw new NotFoundError("☠️ Den här användaren finns inte ☠️");
   }
-  return res.sendStatus(204);
 
+  return res.sendStatus(204);
 };

@@ -49,7 +49,7 @@ exports.getPubById = async (req, res) => {
 
   const response = {
     pub: pub,
-    reviews: [pubReviews],
+    reviews: pubReviews,
   };
 
   return res.status(200).json(response);
@@ -125,16 +125,14 @@ exports.createNewPub = async (req, res) => {
 
   console.log(newPubId);
   return res
-  .send(
-    "🔥 Wohoo du har skapat en ny pub 🔥")
+    .send("🔥 Wohoo du har skapat en ny pub 🔥")
     .sendStatus(201)
     .setHeader(
       "Location",
       `${req.protocol}://${req.headers.host}/api/v1/pubs/${newPubId}`
-    )
-    
-     
-    // .sendStatus(201);
+    );
+
+  // .sendStatus(201);
 };
 
 exports.updatePub = async (req, res) => {
@@ -233,7 +231,7 @@ exports.deletePubById = async (req, res) => {
     });
 
     return res.status(200).json({
-      message: "😱 Du har FÖR ALLTID tagit BOrt baren 😱",
+      message: "😱 Du har FÖR ALLTID tagit Bort puben 😱",
     });
 
     // return res.sendStatus(204);
