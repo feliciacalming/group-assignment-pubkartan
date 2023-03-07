@@ -8,12 +8,17 @@ const pubRoutes = require("./routes/pubRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const { errorMiddleware } = require("./middleware/errorMiddleware");
 const { notFoundMiddleware } = require("./middleware/notFoundMiddleware");
+const cors = require("cors")
 
 const { sequelize } = require("./database/config");
 
 /* ----------- Create our Expres app ------------ */
 const app = express();
 app.use(helmet());
+app.use(cors({
+  origin: ["http://localhost:3000"],
+  methods: ["GET", "PUT", "POST", "DELETE"] 
+}));
 
 /* ---------------------------------------------- */
 /* ----------------- Middleware ----------------- */
