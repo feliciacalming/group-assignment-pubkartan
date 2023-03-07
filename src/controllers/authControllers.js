@@ -8,7 +8,6 @@ const { userRoles } = require("../constants/users");
 exports.register = async (req, res) => {
   const { username, email, password } = req.body;
 
-  //kryptera det önskade lösenordet
   const salt = await bcrypt.genSalt(10);
   const hashedpassword = await bcrypt.hash(password, salt);
 
@@ -75,10 +74,8 @@ exports.login = async (req, res) => {
     role: user.role,
   };
 
-  //skapa jwt-token
   const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET);
 
-  //returnera token
   return res.json({
     token: jwtToken,
     user: jwtPayload,
