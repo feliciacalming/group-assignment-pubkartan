@@ -26,19 +26,15 @@ exports.createNewReview = async (req, res) => {
       },
       type: QueryTypes.INSERT,
     }
-    );
-    return res
-    .send(
-      "🔥 Du har skapen en ny recension 🔥")
+  );
+  return res
+    .send("🔥 Du har skapat en ny recension 🔥")
     .sendStatus(201)
     .setHeader(
       "Location",
       `${req.protocol}://${req.headers.host}/api/v1/reviews/${newReviewId}`
-    )
-
-  };
-    // .sendStatus(201);
-
+    );
+};
 
 exports.deleteReviewById = async (req, res) => {
   const reviewId = req.params.reviewId;
@@ -53,7 +49,8 @@ exports.deleteReviewById = async (req, res) => {
     }
   );
 
-  if (!result_reviews) throw new NotFoundError("Den här reviewn finns inte!");
+  if (!result_reviews)
+    throw new NotFoundError("⛔ Den här reviewn finns inte! ⛔");
 
   if (req.user.role == userRoles.ADMIN || userId == result_reviews.fk_user_id) {
     await sequelize.query(
@@ -63,12 +60,11 @@ exports.deleteReviewById = async (req, res) => {
         type: QueryTypes.DELETE,
       }
     );
-    
+
     return res.status(200).json({
-      message: "😱 Du har FÖR ALLTID tagit BOrt REceNsION 😱",
+      message: "😱 Du har FÖR ALLTID tagit bort recensionen 😱",
     });
-  
-    
+
     // return res.sendStatus(204);
   } else {
     throw new UnauthorizedError(

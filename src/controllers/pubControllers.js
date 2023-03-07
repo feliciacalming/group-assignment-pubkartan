@@ -184,10 +184,7 @@ exports.updatePub = async (req, res) => {
         type: QueryTypes.UPDATE,
       }
     );
-    return res
-      .status(200)
-      .send("🔥Du har uppdaterat puben!🔥")
-      .json(updatedPub);
+    return res.status(200).json(updatedPub);
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att uppdatera denna pub! ⛔"
@@ -236,7 +233,7 @@ exports.deletePubById = async (req, res) => {
       type: QueryTypes.DELETE,
     });
 
-    return res.send("😱 Du har FÖR ALLTID tagit bort puben 😱").status(204);
+    return res.status(204);
 
     // return res.sendStatus(204);
   } else {

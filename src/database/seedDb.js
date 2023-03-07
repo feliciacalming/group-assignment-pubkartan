@@ -147,7 +147,7 @@ const seedPubsDb = async () => {
 
     await sequelize.query(reviewInsertQuery);
 
-    console.log("Database successfully populated with data...");
+    console.log("🚀🚀🚀 Database successfully populated with data!");
   } catch (error) {
     console.error(error);
   } finally {
