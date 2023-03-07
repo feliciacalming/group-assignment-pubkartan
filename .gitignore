@@ -1,3 +1,4 @@
 node_modules
 .env
 pubsDb.sqlite
+src/database/pubsDb.sqlite

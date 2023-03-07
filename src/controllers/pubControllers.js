@@ -10,12 +10,12 @@ const { userRoles } = require("../constants/users");
 
 exports.getAllPubs = async (req, res) => {
   let city = req.query.city;
-  let limit = req.query.limit || 10;
+  let limit = req.query.limit || 15;
   let pubs;
 
   if (!city) {
     pubs = await sequelize.query(
-      `SELECT pub.name, pub.address, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage FROM pub LIMIT $limit;`,
+      `SELECT pub.name, pub.address, city.city_name AS city, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage FROM pub LEFT JOIN city ON city.id = pub.fk_city_id LIMIT $limit;`,
       { bind: { limit } }
     );
   } else {
@@ -23,7 +23,7 @@ exports.getAllPubs = async (req, res) => {
     city = city[0].toUpperCase() + city.substring(1).toLowerCase();
 
     pubs = await sequelize.query(
-      `SELECT pub.name, pub.address, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage, city.city_name FROM pub LEFT JOIN city ON city.id = pub.fk_city_id WHERE city.city_name = $city LIMIT $limit;`,
+      `SELECT pub.name, pub.address, city.city_name AS city, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage FROM pub LEFT JOIN city ON city.id = pub.fk_city_id WHERE city.city_name = $city LIMIT $limit;`,
       { bind: { city: city, limit } }
     );
   }
@@ -104,7 +104,7 @@ exports.createNewPub = async (req, res) => {
     checkForExistingPub.pub_address
   ) {
     throw new BadRequestError(
-      "Den här puben finns redan i den här staden på den här adressen!"
+      "⛔Den här puben finns redan i den här staden på den här adressen!⛔"
     );
   } else {
     cityId = checkForExistingPub.city_id;
@@ -136,8 +136,6 @@ exports.createNewPub = async (req, res) => {
       "Location",
       `${req.protocol}://${req.headers.host}/api/v1/pubs/${newPubId}`
     );
-
-  // .sendStatus(201);
 };
 
 exports.updatePub = async (req, res) => {
@@ -186,7 +184,10 @@ exports.updatePub = async (req, res) => {
         type: QueryTypes.UPDATE,
       }
     );
-    return res.status(200).json(updatedPub);
+    return res
+      .status(200)
+      .send("🔥Du har uppdaterat puben!🔥")
+      .json(updatedPub);
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att uppdatera denna pub! ⛔"
@@ -235,9 +236,7 @@ exports.deletePubById = async (req, res) => {
       type: QueryTypes.DELETE,
     });
 
-    return res.status(200).json({
-      message: "😱 Du har FÖR ALLTID tagit Bort puben 😱",
-    });
+    return res.send("😱 Du har FÖR ALLTID tagit bort puben 😱").status(204);
 
     // return res.sendStatus(204);
   } else {
