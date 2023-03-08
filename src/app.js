@@ -9,6 +9,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const { errorMiddleware } = require("./middleware/errorMiddleware");
 const { notFoundMiddleware } = require("./middleware/notFoundMiddleware");
 const cors = require("cors");
+const xss = require("xss-clean");
 
 const { sequelize } = require("./database/config");
 
@@ -20,6 +21,7 @@ app.use(
     methods: ["GET", "PUT", "POST", "DELETE"],
   })
 );
+app.use(xss());
 
 app.use(express.json());
 
@@ -42,7 +44,7 @@ const run = async () => {
     await sequelize.authenticate();
 
     app.listen(port, () => {
-      console.log(`🚀 Server is running on port ${port}`);
+      console.log(`🚀 Server is listening on port ${port}`);
     });
   } catch (error) {
     console.error(error);

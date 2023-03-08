@@ -41,8 +41,6 @@ exports.getPubById = async (req, res) => {
     }
   );
 
-  console.log(pub);
-
   const pubReviews = await sequelize.query(
     `SELECT review.id, review.review, review.rating, review.created_at, user.username AS username FROM review JOIN user ON pub.id = review.fk_pub_id JOIN pub ON user.id = review.fk_user_id WHERE pub.id = $pubId;`,
     {
@@ -65,14 +63,12 @@ exports.getPubById = async (req, res) => {
     total += ratings[i].rating;
   }
 
-  const averageRating = total / ratings.length;
-
   if (!pub) throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
 
   const response = {
     pub: pub,
     reviews: pubReviews,
-    averageRating: averageRating,
+    averageRating: total / ratings.length,
   };
 
   return res.status(200).json(response);
