@@ -33,10 +33,13 @@ exports.getAllPubs = async (req, res) => {
 
 exports.getPubById = async (req, res) => {
   const pubId = req.params.pubId;
-  const pub = await sequelize.query(`SELECT * FROM pub WHERE id = $pubId`, {
-    bind: { pubId },
-    type: QueryTypes.SELECT,
-  });
+  const pub = await sequelize.query(
+    `SELECT pub.name, pub.address, city.city_name AS city, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage FROM pub LEFT JOIN city ON city.id = pub.fk_city_id WHERE pub.id = $pubId`,
+    {
+      bind: { pubId },
+      type: QueryTypes.SELECT,
+    }
+  );
 
   console.log(pub);
 
@@ -48,11 +51,28 @@ exports.getPubById = async (req, res) => {
     }
   );
 
+  const ratings = await sequelize.query(
+    `SELECT review.rating FROM review WHERE review.fk_pub_id = $pubId`,
+    {
+      bind: { pubId },
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  let total = 0;
+
+  for (let i = 0; i < ratings.length; i++) {
+    total += ratings[i].rating;
+  }
+
+  const averageRating = total / ratings.length;
+
   if (!pub) throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
 
   const response = {
     pub: pub,
     reviews: pubReviews,
+    averageRating: averageRating,
   };
 
   return res.status(200).json(response);
