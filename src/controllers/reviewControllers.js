@@ -1,10 +1,5 @@
-const { query } = require("express");
 const { QueryTypes } = require("sequelize");
-const {
-  NotFoundError,
-  UnauthenticatedError,
-  UnauthorizedError,
-} = require("../utils/errors");
+const { NotFoundError, UnauthorizedError } = require("../utils/errors");
 const { sequelize } = require("../database/config");
 const { userRoles } = require("../constants/users");
 
@@ -64,8 +59,6 @@ exports.deleteReviewById = async (req, res) => {
     return res.status(200).json({
       message: "😱 Du har FÖR ALLTID tagit bort recensionen 😱",
     });
-
-    // return res.sendStatus(204);
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att ta bort denna recensionen! ⛔"

@@ -1,7 +1,6 @@
 const { QueryTypes } = require("sequelize");
 const {
   NotFoundError,
-  UnauthenticatedError,
   UnauthorizedError,
   BadRequestError,
 } = require("../utils/errors");
@@ -213,9 +212,6 @@ exports.deletePubById = async (req, res) => {
   const pubId = req.params.pubId;
   const userId = req.user.userId;
 
-  console.log(pubId);
-  console.log(userId);
-
   const [users_pubs] = await sequelize.query(
     `
     SELECT * FROM pub WHERE id = $pubId;`,
@@ -236,23 +232,18 @@ exports.deletePubById = async (req, res) => {
     }
   );
 
-  console.log(pub_reviews);
-
   if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
-    if (pub_reviews.length > 0) {
-      await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {
-        bind: { pubId: pubId },
-        type: QueryTypes.DELETE,
-      });
-    }
+    await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {
+      bind: { pubId: pubId },
+      type: QueryTypes.DELETE,
+    });
+
     await sequelize.query("DELETE FROM pub WHERE id = $pubId RETURNING *", {
       bind: { pubId: pubId },
       type: QueryTypes.DELETE,
     });
 
     return res.status(204);
-
-    // return res.sendStatus(204);
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att ta bort denna pub! ⛔"
