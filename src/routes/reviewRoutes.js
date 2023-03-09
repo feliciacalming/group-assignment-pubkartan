@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const { userRoles } = require("../constants/users");
 const { isAuthenticated } = require("../middleware/authenticationMiddleware");
 
 const {
