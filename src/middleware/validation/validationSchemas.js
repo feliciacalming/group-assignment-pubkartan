@@ -40,6 +40,11 @@ exports.pubSchema = [
     .isEmpty()
     .isLength({ min: 3, max: 25 })
     .withMessage("📬Du måste ange en adress!📬"),
+  body("city")
+    .not()
+    .isEmpty()
+    .isLength({ min: 1, max: 25 })
+    .withMessage("❗️ Du måste ange en stad! ❗️"),
   body("description")
     .isLength({ max: 150 })
     .withMessage("✍🏻 Din beskrivning får vara max 150 tecken!"),
