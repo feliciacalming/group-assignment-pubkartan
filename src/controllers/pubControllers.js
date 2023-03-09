@@ -1,7 +1,6 @@
 const { QueryTypes } = require("sequelize");
 const {
   NotFoundError,
-  UnauthenticatedError,
   UnauthorizedError,
   BadRequestError,
 } = require("../utils/errors");
@@ -197,16 +196,10 @@ exports.deletePubById = async (req, res) => {
   const pubId = req.params.pubId;
   const userId = req.user.userId;
 
-  const pub = await sequelize.query(
-    `
-    SELECT * FROM pub WHERE id = $pubId;`,
-    {
-      bind: { pubId: pubId },
-      type: QueryTypes.SELECT,
-    }
-  );
-
-  console.log(pub);
+  const pub = await sequelize.query(`SELECT * FROM pub WHERE id = $pubId;`, {
+    bind: { pubId: pubId },
+    type: QueryTypes.SELECT,
+  });
 
   if (pub.length <= 0) {
     throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
@@ -224,8 +217,6 @@ exports.deletePubById = async (req, res) => {
   for (let i = 0; i < pubOwner.length; i++) {
     pubOwner = pubOwner[i].fk_user_id;
   }
-  console.log(userId);
-  console.log(pubOwner);
 
   if (userId == pubOwner || req.user.role == userRoles.ADMIN) {
     await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {

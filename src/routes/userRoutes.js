@@ -10,9 +10,8 @@ const {
 } = require("../controllers/userControllers");
 
 router.get("/", isAuthenticated, getAllUsers);
-
 router.get("/:userId", getUserById);
-
+router.put("/:userId", isAuthenticated, updateUser);
 router.delete("/:userId", isAuthenticated, deleteUserById);
 
 module.exports = router;
