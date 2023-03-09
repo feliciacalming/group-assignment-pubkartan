@@ -74,7 +74,8 @@ exports.createNewPub = async (req, res) => {
   const userId = req.user.userId;
 
   let cityId;
-  let city_name = city.trim();
+  let city_name = city;
+  city_name = city_name.trim();
   city_name = city_name[0].toUpperCase() + city_name.substring(1).toLowerCase();
 
   const [checkForExistingPub] = await sequelize.query(
