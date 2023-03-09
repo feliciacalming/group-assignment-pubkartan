@@ -217,8 +217,6 @@ exports.deletePubById = async (req, res) => {
   for (let i = 0; i < pubOwner.length; i++) {
     pubOwner = pubOwner[i].fk_user_id;
   }
-  console.log(userId);
-  console.log(pubOwner);
 
   if (userId == pubOwner || req.user.role == userRoles.ADMIN) {
     await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {
@@ -230,10 +228,6 @@ exports.deletePubById = async (req, res) => {
       bind: { pubId: pubId },
       type: QueryTypes.DELETE,
     });
-
-    return res.status(204);
-
-    // return res.sendStatus(204);
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att ta bort denna pub! ⛔"
