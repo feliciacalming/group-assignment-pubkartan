@@ -61,7 +61,7 @@ exports.deleteReviewById = async (req, res) => {
       }
     );
 
-    return res.status(200).json({
+    return res.sendStatus(204).json({
       message: "😱 Du har FÖR ALLTID tagit bort recensionen 😱",
     });
 
