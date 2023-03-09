@@ -14,7 +14,7 @@ const { pubSchema } = require("../middleware/validation/validationSchemas");
 router.get("/", getAllPubs);
 router.get("/:pubId", getPubById);
 router.post("/", validate(pubSchema), isAuthenticated, createNewPub);
-router.put("/:pubId", isAuthenticated, updatePub);
+router.put("/:pubId", validate(pubSchema), isAuthenticated, updatePub);
 router.delete("/:pubId", isAuthenticated, deletePubById);
 
 module.exports = router;
