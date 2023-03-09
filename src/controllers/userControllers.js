@@ -19,7 +19,6 @@ exports.getAllUsers = async (req, res) => {
     total: users.length,
   };
 
-  console.log(response);
   return res.status(200).json(response);
 };
 

@@ -131,12 +131,12 @@ exports.createNewPub = async (req, res) => {
   );
 
   return res
-    .send("🔥 Wohoo du har skapat en ny pub 🔥")
-    .sendStatus(201)
     .setHeader(
       "Location",
       `${req.protocol}://${req.headers.host}/api/v1/pubs/${newPubId}`
-    );
+    )
+    .status(201)
+    .json({ message: "🔥 Wohoo du har skapat en ny pub 🔥" });
 };
 
 exports.updatePub = async (req, res) => {

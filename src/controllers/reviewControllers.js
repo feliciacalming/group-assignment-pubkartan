@@ -23,12 +23,12 @@ exports.createNewReview = async (req, res) => {
     }
   );
   return res
-    .send("🔥 Du har skapat en ny recension 🔥")
-    .sendStatus(201)
     .setHeader(
       "Location",
       `${req.protocol}://${req.headers.host}/api/v1/reviews/${newReviewId}`
-    );
+    )
+    .status(201)
+    .json({ message: "🔥 Du har skapat en ny recension 🔥" });
 };
 
 exports.deleteReviewById = async (req, res) => {
