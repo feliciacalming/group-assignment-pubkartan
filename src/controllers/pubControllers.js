@@ -34,7 +34,7 @@ exports.getAllPubs = async (req, res) => {
 exports.getPubById = async (req, res) => {
   const pubId = req.params.pubId;
   const pub = await sequelize.query(
-    `SELECT pub.name, pub.address, city.city_name AS city, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage FROM pub LEFT JOIN city ON city.id = pub.fk_city_id WHERE pub.id = $pubId`,
+    `SELECT pub.name, pub.address, city.city_name AS city, pub.description, pub.opening_hours, pub.happy_hour, pub.beer_price, pub.webpage, AVG(review.rating) AS rating FROM pub LEFT JOIN city ON city.id = pub.fk_city_id LEFT JOIN review ON pub.id = review.fk_pub_id WHERE pub.id = $pubId`,
     {
       bind: { pubId },
       type: QueryTypes.SELECT,
@@ -49,26 +49,11 @@ exports.getPubById = async (req, res) => {
     }
   );
 
-  const ratings = await sequelize.query(
-    `SELECT review.rating FROM review WHERE review.fk_pub_id = $pubId`,
-    {
-      bind: { pubId },
-      type: QueryTypes.SELECT,
-    }
-  );
-
-  let total = 0;
-
-  for (let i = 0; i < ratings.length; i++) {
-    total += ratings[i].rating;
-  }
-
   if (!pub) throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
 
   const response = {
     pub: pub,
     reviews: pubReviews,
-    averageRating: total / ratings.length,
   };
 
   return res.status(200).json(response);
@@ -169,7 +154,7 @@ exports.updatePub = async (req, res) => {
   } = req.body;
 
   const userId = req.user.userId;
-  const [users_pubs] = await sequelize.query(
+  const [pub] = await sequelize.query(
     `
     SELECT * FROM pub WHERE id = $pubId;`,
     {
@@ -178,10 +163,9 @@ exports.updatePub = async (req, res) => {
     }
   );
 
-  if (!users_pubs)
-    throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
+  if (!pub) throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
 
-  if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
+  if (req.user.role == userRoles.ADMIN || userId == pub.fk_user_id) {
     const [updatedPub, metadata] = await sequelize.query(
       `UPDATE pub SET name=$name, address=$address, fk_city_id=$fk_city_id, description=$description, opening_hours=$opening_hours, happy_hour=$happy_hour, beer_price=$beer_price, webpage=$webpage, fk_user_id=$fk_user_id WHERE id = $pubId RETURNING *;`,
       {
@@ -212,10 +196,7 @@ exports.deletePubById = async (req, res) => {
   const pubId = req.params.pubId;
   const userId = req.user.userId;
 
-  console.log(pubId);
-  console.log(userId);
-
-  const [users_pubs] = await sequelize.query(
+  const pub = await sequelize.query(
     `
     SELECT * FROM pub WHERE id = $pubId;`,
     {
@@ -224,37 +205,41 @@ exports.deletePubById = async (req, res) => {
     }
   );
 
-  if (!users_pubs)
-    throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
+  console.log(pub);
 
-  const pub_reviews = await sequelize.query(
-    `SELECT * FROM review WHERE fk_pub_id = $pubId;`,
+  if (pub.length <= 0) {
+    throw new NotFoundError("☠️ Det finns ingen pub med det id:t ☠️");
+  }
+
+  let pubOwner = await sequelize.query(
+    `
+    SELECT fk_user_id FROM pub WHERE id = $pubId;`,
     {
       bind: { pubId: pubId },
       type: QueryTypes.SELECT,
     }
   );
 
-  console.log(pub_reviews);
+  for (let i = 0; i < pubOwner.length; i++) {
+    pubOwner = pubOwner[i].fk_user_id;
+  }
+  console.log(userId);
+  console.log(pubOwner);
 
-  if (req.user.role == userRoles.ADMIN || userId == users_pubs.fk_user_id) {
-    if (pub_reviews.length > 0) {
-      await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {
-        bind: { pubId: pubId },
-        type: QueryTypes.DELETE,
-      });
-    }
-    await sequelize.query("DELETE FROM pub WHERE id = $pubId RETURNING *", {
+  if (userId == pubOwner || req.user.role == userRoles.ADMIN) {
+    await sequelize.query("DELETE FROM review WHERE fk_pub_id = $pubId", {
       bind: { pubId: pubId },
       type: QueryTypes.DELETE,
     });
 
-    return res.status(204);
-
-    // return res.sendStatus(204);
+    await sequelize.query("DELETE FROM pub WHERE id = $pubId", {
+      bind: { pubId: pubId },
+      type: QueryTypes.DELETE,
+    });
   } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att ta bort denna pub! ⛔"
     );
   }
+  return res.sendStatus(204);
 };
