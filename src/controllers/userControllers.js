@@ -93,18 +93,27 @@ exports.updateUser = async (req, res) => {
 exports.deleteUserById = async (req, res) => {
   const userId = req.params.userId;
 
-  if (userId != req.user.userId && req.user.role !== userRoles.ADMIN) {
+  if (userId == req.user.userId || req.user.role == userRoles.ADMIN) {
+    await sequelize.query(
+      `
+      UPDATE pub SET fk_user_id = 1
+      WHERE fk_user_id = $userId
+      RETURNING *;
+      `,
+      {
+        bind: { userId: userId },
+        type: QueryTypes.UPDATE,
+      }
+    );
+    await sequelize.query("DELETE FROM user WHERE id = $userId RETURNING *;", {
+      bind: { userId },
+      type: QueryTypes.DELETE,
+    });
+  } else {
     throw new UnauthorizedError(
       "⛔ Du har inte befogenhet att radera detta konto ⛔"
     );
   }
-
-  const [results, metadata] = await sequelize.query(
-    "DELETE FROM user WHERE id = $userId RETURNING *",
-    {
-      bind: { userId },
-    }
-  );
 
   return res.sendStatus(204);
 };

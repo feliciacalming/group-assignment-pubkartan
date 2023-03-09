@@ -120,7 +120,7 @@ const seedPubsDb = async () => {
        review TEXT NOT NULL,
        rating INTEGER NOT NULL,
        created_at TEXT NOT NULL,
-       fk_user_id INTEGER NOT NULL,
+       fk_user_id INTEGER ,
        fk_pub_id INTEGER NOT NULL,
 
        FOREIGN KEY(fk_user_id) REFERENCES user(id),
